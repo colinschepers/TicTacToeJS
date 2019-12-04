@@ -1,4 +1,4 @@
-const simpleStarCount = 300;
+const simpleStarCount = 40;
 const complexStarCount = 0;
 const starRadiusMin = 5;
 const starRadiusMax = 10;
