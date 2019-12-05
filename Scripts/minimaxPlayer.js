@@ -17,7 +17,7 @@ class MiniMaxPlayer {
         this.depthLimit = depthLimit || 10;
     }
 
-    async getMove(state) {
+    getMove(state) {
         let timeout = Date.now() + (this.runningTimeInMilliseconds);
         let move = this.__iterativeDeepening(state, this.depthLimit, timeout);
         return move;

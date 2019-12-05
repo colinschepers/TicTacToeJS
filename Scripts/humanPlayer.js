@@ -1,5 +1,5 @@
 class HumanPlayer {
-    async getMove(state) {
+    getMove(state) {
         // will be handled by mousePressed event
     }
 }
