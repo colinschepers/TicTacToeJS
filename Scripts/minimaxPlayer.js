@@ -1,18 +1,26 @@
+// Allow for multi threading using webWorkers
+onmessage = function (messageEvent) {
+    importScripts("State.js");
+    let state = new State();
+    state.bitBoards = messageEvent.data[0].bitBoards;
+    state.score = messageEvent.data[0].score;
+    state.roundNr = messageEvent.data[0].roundNr;
+    state.gameOver = messageEvent.data[0].gameOver;
+    let miniMaxPlayer = new MiniMaxPlayer(messageEvent.data[1]);
+    let move = miniMaxPlayer.getMove(state);
+    postMessage([move]);
+}
+
 class MiniMaxPlayer {
     constructor(runningTimeInMilliseconds, depthLimit) {
-        this.runningTimeInMilliseconds = runningTimeInMilliseconds || 300;
+        this.runningTimeInMilliseconds = runningTimeInMilliseconds || 1000;
         this.depthLimit = depthLimit || 10;
     }
 
     async getMove(state) {
         let timeout = Date.now() + (this.runningTimeInMilliseconds);
         let move = this.__iterativeDeepening(state, this.depthLimit, timeout);
-        await sleep(timeout - Date.now());
         return move;
-    }
-
-    opponentMoved(move) {
-        // do nothing
     }
 
     __iterativeDeepening(state, depthLimit, timeout) {
@@ -53,7 +61,7 @@ class MiniMaxPlayer {
     __getScore(state, depth, depthLimit, maxPlayerNr, alpha, beta, timeout) {
 
         if (state.isGameOver || depth > depthLimit || Date.now() >= timeout) {
-            return maxPlayerNr == 0 ? state.score : -state.score;
+            return maxPlayerNr == 0 ? state.score : 1 - state.score;
         }
 
         let bestScore = null;
@@ -88,8 +96,4 @@ class MiniMaxPlayer {
 
         return bestScore - (depth * 0.001);
     }
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }

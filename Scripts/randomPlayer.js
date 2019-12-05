@@ -1,22 +1,21 @@
-class RandomPlayer {
-    constructor(runningTimeInMilliseconds) {
-        this.runningTimeInMilliseconds = runningTimeInMilliseconds || 200;
-    }
+// Allow for multi threading using webWorkers
+onmessage = function (messageEvent) {
+    importScripts("State.js");
+    let state = new State();
+    state.bitBoards = messageEvent.data[0].bitBoards;
+    state.score = messageEvent.data[0].score;
+    state.roundNr = messageEvent.data[0].roundNr;
+    state.gameOver = messageEvent.data[0].gameOver;
+    let randomPlayer = new RandomPlayer();
+    let move = randomPlayer.getMove(state);
+    postMessage([move]);
+}
 
-    async getMove(state) {
-        let timeout = Date.now() + (this.runningTimeInMilliseconds);
+class RandomPlayer {
+    getMove(state) {
         let moves = state.getValidMoves();
         let randomNr = Math.floor((Math.random() * moves.length));
         let move = moves[randomNr];
-        await sleep(timeout - Date.now());
         return move;
     }
-
-    opponentMoved(move) {
-        // do nothing
-    }
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }

@@ -29,7 +29,7 @@ function drawMenuItem(x, y, txt) {
 }
 
 function fillTextItems() {
-    const players = ['Human', 'Random', 'MiniMax'];
+    const players = ['Human', 'Random', 'MCTS'];
     for (var y = 0; y < 3; y++) {
         for (var x = 0; x < 3; x++) {
             textItems[x][y] = createGraphics(width, height);

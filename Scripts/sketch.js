@@ -2,7 +2,7 @@ const size = 400;
 const barRadius = size / 50;
 const gridSize = (size - 2 * barRadius) / 3;
 const rotationSpeed = 0.15;
-const aiSpeedInMilliseconds = 150;
+const moveTimeInMilliseconds = 250;
 
 var players = [null, null];
 var state = null;
@@ -21,8 +21,8 @@ function draw() {
     background(0);
     ambientLight(75);
     directionalLight(255, 255, 255, mouseX - width / 2, mouseY - height / 2, 0);
-    drawStars();
     checkState();
+    drawStars();
     drawFrame();
     drawSymbols();
     drawMenu();
@@ -39,32 +39,42 @@ function newGame() {
 function checkState() {
     if (state && !state.isGameOver) {
         if (!awaitingMove) {
-            move();
+            getMove();
         }
     } else {
         gameOver();
     }
 }
 
-function move() {
+function getMove() {
     awaitingMove = true;
 
-    var roundNr = state.roundNr;
-    var playerToMove = players[state.getPlayerToMove()];
-
-    if (playerToMove && playerToMove.constructor.name !== 'HumanPlayer') {
-        playerToMove
-            .getMove(state)
-            .catch(e => {
-                console.error(e);
-            })
-            .then((move) => {
-                if (roundNr == state.roundNr) {
-                    state.play(move);
-                }
-                awaitingMove = false;
-            });
+    let player = players[state.getPlayerToMove()];
+    if (player && player.constructor.name != 'HumanPlayer') {
+        let startTime = Date.now();
+        try {
+            const worker = new Worker(`Scripts/${player.constructor.name}.js`);
+            worker.onmessage = function (messageEvent) {
+                applyMove(messageEvent.data[0], startTime);
+            }
+            worker.onerror = function (error) {
+                console.error(error);
+                applyMove(player.getMove(state), startTime);
+            };
+            worker.postMessage([state, moveTimeInMilliseconds]);
+        } catch (error) {
+            console.error(error);
+            applyMove(player.getMove(state), startTime);
+        }
     }
+}
+
+function applyMove(move, startTime) {
+    let timeLeft = moveTimeInMilliseconds - (Date.now() - startTime);
+    setTimeout(function () {
+        state.play(move);
+        awaitingMove = false;
+    }, max(0, timeLeft));
 }
 
 function gameOver() {
@@ -84,8 +94,8 @@ function gameOver() {
 
 function mouseReleased() {
     if (state && !state.isGameOver) {
-        var playerToMove = players[state.getPlayerToMove()];
-        if (playerToMove.constructor.name === 'HumanPlayer') {
+        var player = players[state.getPlayerToMove()];
+        if (player.constructor.name === 'HumanPlayer') {
             let x = Math.floor(mouseX / (width / 3));
             let y = Math.floor(mouseY / (height / 3));
             let move = y * 3 + x;
@@ -99,18 +109,18 @@ function mouseReleased() {
         let y = Math.floor(mouseY / (height / 3));
         if (x >= 0 && x < 3 && y >= 0 && y < 3) {
             if (x == 0) {
-                players[0] = new HumanPlayer()
+                players[0] = new HumanPlayer();
             } else if (x == 1) {
-                players[0] = new RandomPlayer(aiSpeedInMilliseconds)
+                players[0] = new RandomPlayer();
             } else if (x == 2) {
-                players[0] = new MiniMaxPlayer(aiSpeedInMilliseconds)
+                players[0] = new MCTSPlayer(moveTimeInMilliseconds);
             }
             if (y == 0) {
-                players[1] = new HumanPlayer()
+                players[1] = new HumanPlayer();
             } else if (y == 1) {
-                players[1] = new RandomPlayer(aiSpeedInMilliseconds)
+                players[1] = new RandomPlayer();
             } else if (y == 2) {
-                players[1] = new MiniMaxPlayer(aiSpeedInMilliseconds)
+                players[1] = new MCTSPlayer(moveTimeInMilliseconds);
             }
             newGame();
         }

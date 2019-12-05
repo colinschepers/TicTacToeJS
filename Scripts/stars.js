@@ -1,5 +1,5 @@
-const simpleStarCount = 30;
-const complexStarCount = 30;
+const simpleStarCount = 20;
+const complexStarCount = 10;
 const starRadiusMin = 5;
 const starRadiusMax = 10;
 const starMovement = 0.1;

@@ -1,5 +1,4 @@
 class State {
-
     constructor() {
         this.bitBoards = [0, 0];
         this.roundNr = 0;
@@ -37,7 +36,7 @@ class State {
     }
 
     getValidMoves() {
-        return State.moves[this.getMergedBoard()];
+        return State.moves[this.getMergedBoard()].slice();
     }
 
     getPlayerToMove() {
