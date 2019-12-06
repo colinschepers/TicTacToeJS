@@ -94,7 +94,7 @@ function gameOver() {
     }
 }
 
-function mouseReleased() {
+function mousePressed() {
     if (state && !state.isGameOver) {
         var player = players[state.getPlayerToMove()];
         if (player.constructor.name === 'HumanPlayer') {
