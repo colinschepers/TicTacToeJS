@@ -50,11 +50,10 @@ function getMove() {
     awaitingMove = true;
 
     const player = players[state.getPlayerToMove()];
-    const playerName = player.constructor.name;
     if (player && player.constructor.name != 'HumanPlayer') {
         let startTime = Date.now();
         try {
-            const scriptName = playerName[0].toUpperCase() +  playerName.slice(1);
+            const scriptName = player.constructor.name[0].toLowerCase() +  player.constructor.name.slice(1);
             const worker = new Worker(`Scripts/${scriptName}.js`);
             worker.onmessage = function (messageEvent) {
                 applyMove(messageEvent.data[0], startTime);
