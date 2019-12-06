@@ -14,7 +14,7 @@ onmessage = function (messageEvent) {
     postMessage([move]);
 }
 
-class MCTSNode {
+class MctsNode {
     constructor(parent, move, state) {
         this.depth = parent ? parent.depth + 1 : 0;
         this.parent = parent;
@@ -28,14 +28,14 @@ class MCTSNode {
     }
 }
 
-class MCTSPlayer {
+class MctsPlayer {
     constructor(runningTimeInMilliseconds) {
         this.runningTimeInMilliseconds = runningTimeInMilliseconds || 1000;
     }
 
     getMove(initialState) {
         let timeout = Date.now() + this.runningTimeInMilliseconds;
-        let root = new MCTSNode(null, null, initialState);
+        let root = new MctsNode(null, null, initialState);
 
         while (Date.now() < timeout) {
             //console.log('Iteration: ' + root.visits)
@@ -98,8 +98,9 @@ class MCTSPlayer {
             let move = node.untriedMoves.pop();
             state.play(move);
 
-            let newChild = new MCTSNode(node, move, state);
+            let newChild = new MctsNode(node, move, state);
             node.children.push(newChild);
+            
             //console.log('Expanded move: ' + newChild.move + ' | untriedMoves: ' + newChild.untriedMoves);
 
             return newChild;
