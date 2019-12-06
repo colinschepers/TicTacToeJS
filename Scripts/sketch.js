@@ -114,14 +114,14 @@ function mousePressed() {
             } else if (x == 1) {
                 players[0] = new RandomPlayer();
             } else if (x == 2) {
-                players[0] = new MCTSPlayer(moveTimeInMilliseconds);
+                players[0] = new MctsPlayer(moveTimeInMilliseconds);
             }
             if (y == 0) {
                 players[1] = new HumanPlayer();
             } else if (y == 1) {
                 players[1] = new RandomPlayer();
             } else if (y == 2) {
-                players[1] = new MCTSPlayer(moveTimeInMilliseconds);
+                players[1] = new MctsPlayer(moveTimeInMilliseconds);
             }
             newGame();
         }

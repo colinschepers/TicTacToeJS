@@ -9,7 +9,7 @@ onmessage = function (messageEvent) {
     state.roundNr = messageEvent.data[0].roundNr;
     state.gameOver = messageEvent.data[0].gameOver;
     let runningTimeInMilliseconds = messageEvent.data[1];
-    let mctsPlayer = new MCTSPlayer(runningTimeInMilliseconds);
+    let mctsPlayer = new MctsPlayer(runningTimeInMilliseconds);
     let move = mctsPlayer.getMove(state);
     postMessage([move]);
 }
@@ -100,7 +100,7 @@ class MctsPlayer {
 
             let newChild = new MctsNode(node, move, state);
             node.children.push(newChild);
-            
+
             //console.log('Expanded move: ' + newChild.move + ' | untriedMoves: ' + newChild.untriedMoves);
 
             return newChild;
