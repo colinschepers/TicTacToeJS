@@ -2,7 +2,7 @@ const UCT_C = Math.sqrt(2);
 
 // Allow for multi threading using webWorkers
 onmessage = function (messageEvent) {
-    importScripts("State.js");
+    importScripts("state.js");
     let state = new State();
     state.bitBoards = messageEvent.data[0].bitBoards;
     state.score = messageEvent.data[0].score;
