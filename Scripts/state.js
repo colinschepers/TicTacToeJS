@@ -91,7 +91,7 @@ State.lineFilter = 0b001001001001001001001001;
 State.moves = [];
 for (var i = 0; i < 0b1000000000; i++) {
     let movesForPosition = [];
-    for (var x = 0; x < 9; x++) {
+    for (let x = 0; x < 9; x++) {
         if ((i & (1 << x)) == 0) {
             movesForPosition.push(x);
         }
