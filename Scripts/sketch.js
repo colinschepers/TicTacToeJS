@@ -2,13 +2,14 @@ const size = 400;
 const barRadius = size / 50;
 const gridSize = (size - 2 * barRadius) / 3;
 const rotationSpeed = 0.15;
-const moveTimeInMilliseconds = 250;
+const moveTime = 300;
 
 var players = [null, null];
 var state = null;
 var awaitingMove = false;
 var rotation = Infinity;
 var menuEnabled = true;
+var startTime = Date.now();
 
 function setup() {
     createCanvas(size, size, WEBGL);
@@ -39,41 +40,26 @@ function newGame() {
 function checkState() {
     if (state && !state.isGameOver) {
         if (!awaitingMove) {
-            getMove();
+            awaitingMove = true;
+            startTime = Date.now();
+            const player = players[state.getPlayerToMove()];
+            if (player && player.constructor.name != 'HumanPlayer') {
+                player.getMove(state, applyMove);
+            }
         }
     } else {
         gameOver();
     }
 }
 
-function getMove() {
-    awaitingMove = true;
-
-    const player = players[state.getPlayerToMove()];
-    if (player && player.constructor.name != 'HumanPlayer') {
-        let startTime = Date.now();
-        try {
-            const scriptName = player.constructor.name[0].toLowerCase() +  player.constructor.name.slice(1);
-            const worker = new Worker(`Scripts/${scriptName}.js`);
-            worker.onmessage = function (messageEvent) {
-                applyMove(messageEvent.data[0], startTime);
-            }
-            worker.onerror = function (error) {
-                console.error(error);
-                applyMove(player.getMove(state), startTime);
-            };
-            worker.postMessage([state, moveTimeInMilliseconds]);
-        } catch (error) {
-            console.error(error);
-            applyMove(player.getMove(state), startTime);
-        }
-    }
-}
-
-function applyMove(move, startTime) {
-    let timeLeft = moveTimeInMilliseconds - (Date.now() - startTime);
+function applyMove(move) {
+    let timeLeft = moveTime - (Date.now() - startTime);
     setTimeout(function () {
-        state.play(move);
+        try { 
+            state.play(move);
+        } catch (error) { 
+            console.error("Invalid move: " + move); 
+        }
         awaitingMove = false;
     }, max(0, timeLeft));
 }
@@ -114,14 +100,14 @@ function mousePressed() {
             } else if (x == 1) {
                 players[0] = new RandomPlayer();
             } else if (x == 2) {
-                players[0] = new MctsPlayer(moveTimeInMilliseconds);
+                players[0] = new MCTSPlayer(moveTime);
             }
             if (y == 0) {
                 players[1] = new HumanPlayer();
             } else if (y == 1) {
                 players[1] = new RandomPlayer();
             } else if (y == 2) {
-                players[1] = new MctsPlayer(moveTimeInMilliseconds);
+                players[1] = new MCTSPlayer(moveTime);
             }
             newGame();
         }
